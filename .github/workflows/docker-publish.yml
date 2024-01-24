@@ -14,9 +14,8 @@ jobs:
   build:
     strategy:
       matrix:
-        # until github actions has native arm64 runners, omit, use QEMU and multi-platform build
-        # {syntax0: arm64, syntax1: aarch64, platform: 'linux/arm64' },
-        arch: [ {syntax0: amd64, syntax1: x86_64, platform: 'linux/amd64' } ]
+        # until github actions has native arm64 runners, use QEMU and multi-platform build
+        arch: [ {syntax0: amd64, syntax1: x86_64, platform: 'linux/amd64' }, {syntax0: arm64, syntax1: aarch64, platform: 'linux/arm64' } ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -47,9 +46,9 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.arch.syntax0 }}-${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.arch.syntax0 }}-${{ github.ref_name }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.arch.platform }}
           build-args: |
             ARCH=${{ matrix.arch.syntax0 }}
             ARCH2=${{ matrix.arch.syntax1 }}
