@@ -1,4 +1,7 @@
 FROM ubuntu:23.04
+
+LABEL org.opencontainers.image.description `Docker image for refresh AWS ECR credentials in kubernetes cluster`
+
 # amd64, arm64
 ARG ARCH
 # x86_64, aarch64
@@ -25,5 +28,8 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-$ARCH2.zip" -o "awscliv2
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$ARCH/kubectl" && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
+
+WORKDIR /scripts
+COPY scripts/ /scripts
 
 ENTRYPOINT ["sh", "/scripts/entrypoint.sh"]
